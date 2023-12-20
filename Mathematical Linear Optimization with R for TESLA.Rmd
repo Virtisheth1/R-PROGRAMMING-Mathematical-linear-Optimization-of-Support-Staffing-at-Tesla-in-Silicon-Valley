@@ -1,0 +1,283 @@
+---
+title: 'Math Final Project'
+author: "Judy Jiang, Aitana Hierro,Virti Sheth, Agustin Arcos"
+
+date: "Dec.3.2023"
+output:
+  html_document: default
+  header-includes: \usepackage{color}
+fontsize: 12pt
+margin: 1in
+---
+```{r setup, echo=FALSE, message=F, warning=F}
+
+#==============================================================================
+#   This chunk will be used for every assignment
+#==============================================================================
+
+library(alabama)
+library(numDeriv)
+```
+
+
+
+```{r Question1 , echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+### Define the cost function
+f <- function(theta) {
+  x <- theta[1:5]
+  y <- theta[6:10]
+  z <- theta[11:12]
+  return(60*sum(x)+60*sum(y)+60*(theta[1]+theta[2]+theta[3]+theta[6]+theta[7]+theta[8]+theta[11])+90*(theta[4]+theta[5]+theta[9]+theta[10]+theta[11]+2*theta[12]))
+}
+
+
+### Define the constrained inequality functions
+g <- function(theta) {
+  h <- 0
+  h[1] <- 6*theta[1]-32
+  h[2] <- 6*theta[6]-8
+  h[3] <- 6*theta[2]-68
+  h[4] <- 6*theta[7]-17
+  h[5] <- 6*(theta[1] + theta[3])-56
+  h[6] <- 6*(theta[6] + theta[8])-14
+  h[7] <- 6*(theta[2] + theta[4])-76
+  h[8] <- 6*(theta[7] + theta[9])-19
+  h[9] <- 6*(theta[3] + theta[5] + theta[11])-64
+  h[10] <- 6*(theta[8] + theta[12])-16
+  h[11] <- 6*(theta[4] + theta[11] + theta[12])-28
+  h[12] <- 6*theta[9]-7
+  h[13] <- 6*(theta[5] + theta[12])-8
+  h[14] <- 6*theta[10]-2
+  return(h)
+}
+
+
+## initial values
+p0 <- c(20,20,20,20,20,20,20,20,20,20,20,20)
+
+
+### Optimize the function
+k <- constrOptim.nl(p0, f, hin = g)
+# Round up the parameter values in k$par
+k$par <- ceiling(k$par)
+#theta = k$par
+
+### print the value of each variable and minimize costs
+print(k$par)
+print(f(k$par))
+
+
+```
+a) How many full-time English-speaking agents, full-time Spanish-speaking agents, and part-time agents should Alex hire for each 2-hour shift to minimize operating costs while attending to all calls?
+
+b) What is the minimum cost for the optimization model to assist Alex’s decision in hiring all agents that she needs?
+
+```{r A1 , echo=FALSE, message=FALSE, warning=FALSE}
+
+
+# Assuming the following counts of agents for each category
+full_time_english_agents <- c(6, 12, 7, 1, 1, 0, 0)  # Replace with your actual values
+full_time_spanish_agents <- c(2, 3, 3, 2, 1, 0, 0)  # Replace with your actual values
+part_time_english_agents <- c(0, 0, 0, 0, 0, 4, 1)  # Replace with your actual values
+
+# Create a data frame with the desired information
+agents_table <- data.frame(
+  'TIME SLOT' = c("7-9 am", "9-11 am", "11-13 pm", "13-15 pm", "15-17 pm", "17-19 pm", "19-21 pm"),
+  'FT.ENGLISH' = full_time_english_agents,
+  'FT.SPANISH' = full_time_spanish_agents,
+  'ST.ENGLISH' = part_time_english_agents
+)
+
+
+
+# Print the table
+print(agents_table)
+
+print(f(k$par))
+```
+
+
+
+```{r Q2 , echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+## Question c and d
+f <- function(theta) {
+  x <- theta[1:5]
+  y <- theta[6:10]
+  z <- theta[11:12]
+  return(60*sum(x)+60*sum(y)+60*(theta[1]+theta[2]+theta[3]+theta[6]+theta[7]+theta[8]+theta[11])+90*(theta[4]+theta[5]+theta[9]+theta[10]+theta[11]+2*theta[12]))
+}
+
+
+### Define the constrained inequality functions, with constrain each variable should greater than 0
+g <- function(theta) {
+  h <- 0
+  h[1] <- 6*theta[1]-32
+  h[2] <- 6*theta[6]-8
+  h[3] <- 6*theta[2]-68
+  h[4] <- 6*theta[7]-17
+  h[5] <- 6*(theta[1] + theta[3])-56
+  h[6] <- 6*(theta[6] + theta[8])-14
+  h[7] <- 6*(theta[2] + theta[4])-76
+  h[8] <- 6*(theta[7] + theta[9])-19
+  h[9] <- 6*(theta[3] + theta[5] + theta[11])-64
+  h[10] <- 6*(theta[8] + theta[12])-16
+  h[11] <- 6*(theta[4] + theta[11] + theta[12])-28
+  h[12] <- 6*theta[9]-7
+  h[13] <- 6*(theta[5] + theta[12])-8
+  h[14] <- 6*theta[10]-2
+  return(h)
+}
+
+p0 <- c(20,20,20,20,20,20,20,20,20,20,20,20)
+
+
+### Define equality constrain (new constrain)
+g2 <- function(theta){
+  h=0
+  h[1]=theta[4]-1
+  h[2]=theta[5]-1
+  return(h)
+}
+
+### Optimize the function
+k <- constrOptim.nl(p0, f, hin = g, heq = g2)
+# Round up the parameter values in k$par
+k$par <- ceiling(k$par)
+f(k$par)
+
+
+print(k$par)
+print(f(k$par))
+```
+
+
+c) How many full-time English-speaking agents, full-time Spanish-speaking agents, and part-time agents should Alex hire for each 2-hour shift to minimize operating costs while attending to all calls? 
+
+d) What is the minimum cost for the optimization model to assist Alex’s decision in hiring all agents that she needs?
+
+```{r A2 , echo=FALSE, message=F, warning=FALSE}
+
+# Assuming the following counts of agents for each category
+full_time_english_agents <- c(6, 13, 7, 1, 1, 0, 0)  # Replace with your actual values
+full_time_spanish_agents <- c(2, 3, 3, 2, 1, 0, 0)  # Replace with your actual values
+part_time_english_agents <- c(0, 0, 0, 0, 0, 4, 1)  # Replace with your actual values
+
+# Create a data frame with the desired information
+agents_table <- data.frame(
+  'TIME SLOT' = c("7-9 am", "9-11 am", "11-13 pm", "13-15 pm", "15-17 pm", "17-19 pm", "19-21 pm"),
+  'FT.ENGLISH' = full_time_english_agents,
+  'FT.SPANISH' = full_time_spanish_agents,
+  'ST.ENGLISH' = part_time_english_agents
+)
+
+# Print the table
+print(agents_table)
+print(f(k$par))
+
+```
+
+```{r Question3 , echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# Question e & f
+
+f <- function(theta) {
+  x <- theta[1:5]
+  z <- theta[6:7]
+  return(60*sum(x)+60*(theta[1]+theta[2]+theta[3]+theta[6])+90*(theta[4]+theta[5]+theta[6]+2*theta[7]))
+}
+
+
+### Define the constrained inequality functions
+g <- function(theta) {
+  h <- 0
+  h[1] <- 6*theta[1]-40
+  h[2] <- 6*theta[2]-85
+  h[3] <- 6*(theta[1]+theta[3])-70
+  h[4] <- 6*(theta[2]+theta[4])-95
+  h[5] <- 6*(theta[3] + theta[5]+theta[6])-80
+  h[6] <- 6*(theta[4] + theta[6]+theta[7])-35
+  h[7] <- 6*(theta[5] + theta[7])-10
+  h[8] <- theta[1]
+  h[9] <- theta[2]
+  h[10] <- theta[3]
+  h[11] <- theta[4]
+  h[12] <- theta[5]
+  h[13] <- theta[6]
+  h[14] <- theta[7]
+  return(h)
+}
+
+p0 <- c(20,20,20,20,20,20,20)
+
+
+### Optimize the function
+k <- constrOptim.nl(p0, f, hin=g)
+k$par <- ceiling(k$par)
+k$value <- round(k$value)
+
+print(k$par)
+print(f(k$par))
+
+
+# Assuming the following counts of agents for each category
+full_time_agents <- c(7, 15, 8, 2, 2, 0, 0)  # Replace with your actual values
+part_time_agents <- c(0, 0, 0, 0, 5, 1, 0)  # Replace with your actual values
+
+# Create a data frame with the desired information
+agents_table <- data.frame(
+  'TIME SLOT' = c("7-9 am", "9-11 am", "11-13 pm", "13-15 pm", "15-17 pm", "17-19 pm", "19-21 pm"),
+  'FULL TIME AGENTS' = full_time_english_agents,
+  'PART TIME AGENTS' = part_time_english_agents
+)
+
+# Print the table
+print(agents_table)
+
+```
+
+e) How many full-time and part-time agents should Alex hire for each 2-hour shift to
+minimize operating costs while attending to all calls? 
+
+f) What is the minimum cost for the optimization model to assist Alex’s decision in
+hiring all agents that she needs? 
+
+
+
+```{r A3 , echo=FALSE, message=FALSE, warning=FALSE}
+
+
+# Assuming the following counts of agents for each category
+full_time_agents <- c(7, 15, 8, 2, 2, 0, 0)  # Replace with your actual values
+part_time_agents <- c(0, 0, 0, 0, 5, 1, 0)  # Replace with your actual values
+
+# Create a data frame with the desired information
+agents_table <- data.frame(
+  'TIME SLOT' = c("7-9 am", "9-11 am", "11-13 pm", "13-15 pm", "15-17 pm", "17-19 pm", "19-21 pm"),
+  'FULL TIME AGENTS' = full_time_english_agents,
+  'PART TIME AGENTS' = part_time_english_agents
+)
+
+# Print the table
+print(agents_table)
+print(f(k$par))
+
+```
+
+
+g) What is the maximum percentage increase in the hourly wage rate that Alex can offer
+to bilingual agents over monolingual agents without increasing the total operating
+costs? 
+
+
+```{r Question4, echo=FALSE, message=FALSE, warning=FALSE}
+rate <- ((5610 - 5130) / 5610)
+percentage <- round(rate * 100, 1)
+print(sprintf("%s%%", percentage))
+
+```
+
+  
+
+
+
